@@ -15,6 +15,7 @@ class App extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleCreateForm = this.handleCreateForm.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
     this.state = {
       date: new Date().toISOString().split('T')[0],
       description: '',
@@ -25,7 +26,7 @@ class App extends Component {
 
   async componentDidMount() {
     try {
-      const url = 'http://localhost:3001/api/records/list'
+      const url = 'http://192.168.1.4:3001/api/records/list'
       const resp = await fetch(url);
       if (resp.status !== 200) throw new Error('Failed to list');
       const data = await resp.json();
@@ -42,7 +43,7 @@ class App extends Component {
       description
     }
     try {
-      const url = 'http://localhost:3001/api/records/create';
+      const url = 'http://192.168.1.4:3001/api/records/create';
       const resp = await fetch(url, {
         method: 'post',
         headers: {
@@ -51,10 +52,26 @@ class App extends Component {
         body: JSON.stringify(body),
       });
       await resp.json();
-      debugger
       if (resp.status !== 201) throw new Error('Failed');
       this.setState({ isCreateFormOpen: false });
     } catch (error) {
+      alert(error);
+    }
+  }
+
+  async handleUpdate(body){
+    try{
+      const url = `http://192.168.1.4:3001/api/records/update/${body.id}`;
+      const resp = await fetch(url, {
+        method: 'put',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify(body),
+      });
+      await resp.json();
+      if (resp.status !== 201) throw new Error('Failed');
+    }catch(error){
       alert(error);
     }
   }
@@ -85,14 +102,14 @@ class App extends Component {
       date, 
       description, 
       records, 
-      isCreateFormOpen, 
-      isEditRecordFormOpen 
+      isCreateFormOpen,
     } = this.state;
     return (
       <Container fluid className='container-div'>
         <Header />
         <ListRecords 
-        records={records} />
+        records={records}
+        handleUpdate={this.handleUpdate} />
         <i
           onClick={() => this.handleCreateForm(true)} className="fa fa-plus-circle fa-3x h1 add-record-span position-fixed"
         />
