@@ -1,61 +1,109 @@
 import React, { Component } from 'react';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import '../node_modules/font-awesome/css/font-awesome.min.css';
+import './App.css';
 import {
   Container,
-  Row,
-  Col,
-  Form,
-  FormGroup,
-  Label,
-  Input,
-  Button,
 } from 'reactstrap';
-import './App.css';
+import Header from './Components/Header';
+import CreateForm from './Components/CreateForm';
+import ListRecords from './Components/ListRecords';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleCreateForm = this.handleCreateForm.bind(this);
     this.state = {
       date: new Date().toISOString().split('T')[0],
+      description: '',
+      records: [],
+      isCreateFormOpen: false,
+    }
+  }
+
+  async componentDidMount() {
+    try {
+      const url = 'http://localhost:3001/api/records/list'
+      const resp = await fetch(url);
+      if (resp.status !== 200) throw new Error('Failed to list');
+      const data = await resp.json();
+      this.setState({ records: data.resp });
+    } catch (error) {
+      alert(error);
+    }
+  }
+
+  async handleSubmit() {
+    const { date, description } = this.state;
+    const body = {
+      date,
+      description
+    }
+    try {
+      const url = 'http://localhost:3001/api/records/create';
+      const resp = await fetch(url, {
+        method: 'post',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify(body),
+      });
+      await resp.json();
+      debugger
+      if (resp.status !== 201) throw new Error('Failed');
+      this.setState({ isCreateFormOpen: false });
+    } catch (error) {
+      alert(error);
     }
   }
 
   handleChange(e) {
-    debugger
+    try {
+      this.setState({
+        [e.target.name]: e.target.value,
+      })
+    } catch (error) {
+      alert(error);
+    }
+  }
+
+  handleCreateForm(flag) {
+    this.setState({ isCreateFormOpen: flag })
+  }
+
+  handleEdit(){
+    const { isEditRecordFormOpen } = this.state;
     this.setState({
-      [e.target.name]: e.target.value,
+      isEditRecordFormOpen: !isEditRecordFormOpen
     })
   }
 
   render() {
-    const { date, description } = this.state;
+    const { 
+      date, 
+      description, 
+      records, 
+      isCreateFormOpen, 
+      isEditRecordFormOpen 
+    } = this.state;
     return (
-      <Container fluid>
-        <Row>
-          <Col sm={12}>
-            <Form>
-              <FormGroup>
-                <Label for="exampleEmail">DATE:</Label>
-                <Input
-                  onChange={(e) => this.handleChange(e)}
-                  value={date}
-                  className='font-size'
-                  type="date"
-                  name="date" />
-              </FormGroup>
-              <FormGroup>
-                <Label for="exampleEmail">DESCRIPTION:</Label>
-                <Input
-                  value={description} className='font-size'
-                  type="textarea"
-                  rows={10}
-                  name="date" />
-              </FormGroup>
-            </Form>
-            <Button color="secondary" size="sm" block>SAVE</Button>
-          </Col>
-        </Row>
+      <Container fluid className='container-div'>
+        <Header />
+        <ListRecords 
+        records={records} />
+        <i
+          onClick={() => this.handleCreateForm(true)} className="fa fa-plus-circle fa-3x h1 add-record-span position-fixed"
+        />
+        {isCreateFormOpen &&
+          <CreateForm
+            date={date}
+            description={description}
+            handleCreateForm={this.handleCreateForm}
+            handleChange={this.handleChange}
+            handleSubmit={this.handleSubmit}
+          />}
       </Container>
     );
   }
