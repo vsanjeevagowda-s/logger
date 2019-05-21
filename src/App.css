@@ -112,11 +112,11 @@ body {
   height: 100%;
 }
 
-@media only screen and (max-device-width: 480px) {
+@media only screen and (max-device-width: 760px) {
   body {
     font-size: 13px !important;
   }
   textarea {
-    font-size: 0.9rem !important;
+    font-size: 0.8rem !important;
   }
 }

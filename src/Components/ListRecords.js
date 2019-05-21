@@ -87,8 +87,10 @@ class Record extends Component {
             </div>
               {!isEditRecordFormOpen &&
               <textarea 
-              className='border py-2 px-1  description-div w-100' disabled>
-                {displayDescription}
+              className='border py-2 px-1  description-div w-100' 
+              rows={10}
+              value={displayDescription}
+              disabled>
               </textarea>}
             {isEditRecordFormOpen &&
               <textarea
