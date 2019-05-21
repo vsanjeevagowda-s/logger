@@ -85,11 +85,11 @@ class Record extends Component {
                 }
               </span>
             </div>
-            {!isEditRecordFormOpen &&
-              <div 
-              className='border py-2 px-1  description-div'>
+              {!isEditRecordFormOpen &&
+              <textarea 
+              className='border py-2 px-1  description-div w-100' disabled>
                 {displayDescription}
-              </div>}
+              </textarea>}
             {isEditRecordFormOpen &&
               <textarea
                 onChange={(e) => this.handleInput(e)}
