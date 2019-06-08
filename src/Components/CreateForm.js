@@ -16,6 +16,8 @@ const CreateForm = (props) => {
     <Row className='border create-record-row position-fixed bg-light'>
       <Col className='create-record-col p-0'>
         <i className="fa fa-times-circle text-dark position-absolute create-form-close cursor-pointer" onClick={() => handleCreateForm(false)} /> 
+        <i onClick={() => handleSubmit()}
+          className="fa fa-save position-absolute text-dark save-icon cursor-pointer"/>
         <div className='height-100'>
           <div className='height-20 border-bottom'>
             <input
@@ -34,8 +36,8 @@ const CreateForm = (props) => {
               onChange={(e) => handleChange(e)} />
           </div>
         </div>
-        <i onClick={() => handleSubmit()}
-          className="fa fa-save position-absolute text-dark save-icon cursor-pointer"/>
+        {/* <i onClick={() => handleSubmit()}
+          className="fa fa-save position-absolute text-dark save-icon cursor-pointer"/> */}
       </Col>
     </Row>)
 }

@@ -27,7 +27,6 @@ body {
 }
 
 .container-div {
-  height: 100%;
   color: white;
   position: relative;
   background-color: #677a93;
@@ -67,9 +66,12 @@ body {
 }
 
 .save-icon {
-  top: 84%;
+  /* top: 84%;
   font-size: 30px;
-  right: 2px;
+  right: 2px; */
+  top: -30px;
+  right: 36px;
+  font-size: 30px;
 }
 
 .height-10{
