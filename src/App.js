@@ -9,6 +9,8 @@ import Header from './Components/Header';
 import CreateForm from './Components/CreateForm';
 import ListRecords from './Components/ListRecords';
 
+const ROOT_URL='http://localhost:3001/api';
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -16,17 +18,41 @@ class App extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleCreateForm = this.handleCreateForm.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
+    this.onSearchKeyChange = this.onSearchKeyChange.bind(this);
+    this.getSearchRecords = this.getSearchRecords.bind(this);
+    this.apicallOnTimeOut = this.apicallOnTimeOut.bind(this);
+    this.fetchRecords = this.fetchRecords.bind(this);
+    this.searchKeySetTimeOutCtrl = ''
     this.state = {
       date: new Date().toISOString().split('T')[0],
       description: '',
       records: [],
       isCreateFormOpen: false,
+      searchKey: '',
     }
   }
 
-  async componentDidMount() {
+  apicallOnTimeOut(fun, params) {
+    if (this.searchKeySetTimeOutCtrl) clearTimeout(this.searchKeySetTimeOutCtrl)
+    this.searchKeySetTimeOutCtrl = setTimeout(() => {
+      fun(params);
+    }, 500);
+  }
+
+  onSearchKeyChange(e) {
+    this.setState({
+      [e.target.name]: e.target.value,
+    });
+    if (e.target.value.length <= 0) {
+      this.apicallOnTimeOut(this.fetchRecords);
+    } else {
+      this.apicallOnTimeOut(this.getSearchRecords, e.target.value);
+    }
+  }
+
+  async getSearchRecords(searchKey){
     try {
-      const url = 'http://192.168.1.4:3001/api/records/list'
+      const url = `${ROOT_URL}/records/search?key=${searchKey}`
       const resp = await fetch(url);
       if (resp.status !== 200) throw new Error('Failed to list');
       const data = await resp.json();
@@ -36,6 +62,22 @@ class App extends Component {
     }
   }
 
+  async fetchRecords(){
+    try {
+      const url = `${ROOT_URL}/records/list`
+      const resp = await fetch(url);
+      if (resp.status !== 200) throw new Error('Failed to list');
+      const data = await resp.json();
+      this.setState({ records: data.resp });
+    } catch (error) {
+      alert(error);
+    }
+  }
+
+  componentDidMount() {
+    this.fetchRecords();
+  }
+
   async handleSubmit() {
     const { date, description } = this.state;
     const body = {
@@ -43,7 +85,7 @@ class App extends Component {
       description
     }
     try {
-      const url = 'http://192.168.1.4:3001/api/records/create';
+      const url = `${ROOT_URL}/records/create`
       const resp = await fetch(url, {
         method: 'post',
         headers: {
@@ -61,7 +103,7 @@ class App extends Component {
 
   async handleUpdate(body){
     try{
-      const url = `http://192.168.1.4:3001/api/records/update/${body.id}`;
+      const url = `${ROOT_URL}/records/update/${body.id}`
       const resp = await fetch(url, {
         method: 'put',
         headers: {
@@ -103,10 +145,11 @@ class App extends Component {
       description, 
       records, 
       isCreateFormOpen,
+      searchKey,
     } = this.state;
     return (
       <Container fluid className='container-div'>
-        <Header />
+        <Header searchKey={searchKey} onSearchKeyChange={this.onSearchKeyChange}/>
         <ListRecords 
         records={records}
         handleUpdate={this.handleUpdate} />
